@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8">
+    <script src="./p5.min.js"></script>
+    <script src="./hammer.min.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+    </script>
+    <title>Cherry's Portfolio</title>
+  </head>
+  <body>
+    <h1 class="subsections">Cherry's Apps</h1>
+    <div class="apps">
+      <div class="row">
+        <div class="col zoom">
+            <button onclick="snakeVisible()"></button>
+        </div>
+        <div class="col">
+          <button onclick="snakeVisible()" class="zoom" id="snakeHide">
+            <img src="Sudoku Solver.PNG" alt="Snake">
+          </button>
+          
+        </div>
+
+      </div>
+      <div id="snakeOverlay" class="overlay">
+        <div id="snakeDiv" class="snake"></div>
+        <button onclick="snakeInvisible()" class="SnakeBack">Back</button>
+        
+      </div>
+
+    </div>
+
+
+  </body>
+</html>
