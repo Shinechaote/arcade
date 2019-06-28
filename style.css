@@ -8,7 +8,8 @@
     float: left;
     text-align: center;
     width: 30%;
-    margin: 0% 5%;
+    padding: 0% 5%;
+    
   }
   .row:after{
     width: 80%;
@@ -35,13 +36,6 @@
     height: 420px;
   }
 
-  .zoom {
-    transition: transform .2s; /* Animation */
-  }
-  
-  .zoom:hover {
-    transform: scale(1.25); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
-  }
   
   @media(max-width:1080px){
     .col{
@@ -61,7 +55,24 @@
     transform: translate(-50%, -50%);
  
 }
+.snakeBack{
+  position: fixed;
+  left: 50%;
+  top: 84%;
+  transform: translate(-50%, -84%);
+  border-radius: 15px;
+  height: 30px;
+  width: 70px;
+  transition: opacity 0.6s ease-in-out;
+  opacity: 0.6;
+}
 
+.snakeBack:hover{
+  color: orangered;
+  outline: none;
+  opacity: 1.0;
+  transition: opacity .35s ease-in-out;
+}
   .overlay {
     position: fixed; /* Sit on top of the page content */
     display: none; /* Hidden by default */

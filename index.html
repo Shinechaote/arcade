@@ -12,20 +12,16 @@
     <h1 class="subsections">Cherry's Apps</h1>
     <div class="apps">
       <div class="row">
-        <div class="col zoom">
+        <div class="col">
             <button onclick="snakeVisible()"></button>
         </div>
-        <div class="col">
-          <button onclick="snakeVisible()" class="zoom" id="snakeHide">
-            <img src="snake.png" alt="Snake">
-          </button>
+            <img id="snakeHide" src="snake.png" onclick="snakeVisible()" alt="Snake">
           
-        </div>
 
       </div>
       <div id="snakeOverlay" class="overlay">
         <div id="snakeDiv" class="snake"></div>
-        <button onclick="snakeInvisible()" class="SnakeBack">Back</button>
+        <button onclick="snakeInvisible()" class="snakeBack">Close</button>
         
       </div>
 
