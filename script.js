@@ -36,17 +36,20 @@ var paddleHeight, paddleWidth, paddleVel, ballHeight, ballWidth;
 var p1Count, p2Count;
 var ballCounter;
 //Balancing
-var originalVelocity = 4;
+var originalVelocity = 6;
 var ballSize = 15;
 var pongFPS = 60
-var possibleVelX = [-2,-3,2,3]
-var possibleVelY = [1,2,-2,-1]
+var possibleVelX = [-8, 8]
+var possibleVelY = [1, 2, -2, -1]
 var gameStarted, roundStarted;
+var maxVelX = 12;
+var maxVelY = 4;
+var scoreToWin = 1
 
 
 function randomChoice(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
-  }
+}
 
 function setup() {
 
@@ -95,7 +98,7 @@ function setup() {
         ballWidth = ballSize;
 
         paddleHeight = 120;
-        paddleWidth = 10
+        paddleWidth = 20
 
         ballX = 250;
         ballY = 250;
@@ -256,20 +259,20 @@ function draw() {
                 }
                 if (hasSameArray(snakePositions)) {
                     gameOver = true
-                    snakePositions[snakePositions.length-1][1] -= velY * 20
-                    snakePositions[snakePositions.length-1][0] -= velX * 20
+                    snakePositions[snakePositions.length - 1][1] -= velY * 20
+                    snakePositions[snakePositions.length - 1][0] -= velX * 20
                 }
-                if(gameOver === false){
+                if (gameOver === false) {
                     if (snakePositions.length > snakeLength && gameOver === false) {
                         snakePositions.splice(0, 1)
                     }
-    
+
                     if (appleX === snakeX && appleY === snakeY) {
                         while (isInArray([appleX, appleY], snakePositions)) {
                             appleX = Math.floor(Math.random() * 25) * 20;
                             appleY = Math.floor(Math.random() * 25) * 20;
                         }
-    
+
                         score += 1;
                         snakeLength += 1;
                         if (velTime >= maxVelTime) {
@@ -277,35 +280,32 @@ function draw() {
                         }
                     }
                 }
-                
+
 
 
             }
 
 
-            
+
             strokeWeight(1)
             stroke(20)
             rect(appleX, appleY, 20, 20)
             fill(255)
             strokeWeight(4)
             stroke(51)
-            for (var i = 0; i < snakePositions.length-1; i++) {
+            for (var i = 0; i < snakePositions.length - 1; i++) {
                 rect(snakePositions[i][0], snakePositions[i][1], 20, 20)
             }
-            fill(255,204,0)
-            rect(snakePositions[snakePositions.length-1][0], snakePositions[snakePositions.length-1][1], 20, 20)
+            fill(255, 204, 0)
+            rect(snakePositions[snakePositions.length - 1][0], snakePositions[snakePositions.length - 1][1], 20, 20)
             textSize(32)
-            if(score < 10){
+            if (score < 10) {
                 fill(255)
-            }
-            else if(score < 20){
-                fill(255,204,0)
-            }
-            else if(score < 35){
-                fill(255,0,0)
-            }
-            else {
+            } else if (score < 20) {
+                fill(255, 204, 0)
+            } else if (score < 35) {
+                fill(255, 0, 0)
+            } else {
                 fill(0)
             }
             textAlign(LEFT)
@@ -331,104 +331,129 @@ function draw() {
         //If Pong is played
         else if (game === 1) {
             background(120)
-            if (timer === false) {
+            if (p1Count !== scoreToWin || p2Count !== scoreToWin) {
+                if (timer === false) {
 
 
 
-                if (roundStarted === true) {
-                    if ((p1Y < 500 - paddleHeight || vel1 === -paddleVel) && (p1Y > 0 || vel1 === paddleVel) && !(collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight))) {
-                        p1Y += vel1;
-                    }
-                    if ((p2Y < 500 - paddleHeight || vel2 === -paddleVel) && (p2Y > 0 || vel2 === paddleVel) && !(collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight))) {
-                        p2Y += vel2;
-                    }
-
-                    if (ballY + ballHeight >= 500 || ballY <= 0) {
-                        ballVelY *= -1
-                    }
-                    ballX += ballVelX;
-                    ballY += ballVelY;
-
-                    if (ballX + ballWidth >= 500) {
-                        ballX = 250;
-                        ballY = 250;
-                        
-                        if(ballCounter > 4){
-                            ballVelX = randomChoice(possibleVelX) + 0.2*(ballCounter-4)
+                    if (roundStarted === true) {
+                        if ((p1Y < 500 - paddleHeight || vel1 === -paddleVel) && (p1Y > 0 || vel1 === paddleVel) && !(collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight))) {
+                            p1Y += vel1;
                         }
-                        else{
-                            ballVelX = randomChoice(possibleVelX) + 0.4;
+                        if ((p2Y < 500 - paddleHeight || vel2 === -paddleVel) && (p2Y > 0 || vel2 === paddleVel) && !(collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight))) {
+                            p2Y += vel2;
                         }
-                        ballVelY = randomChoice(possibleVelY);
 
-                        p1X = 40;
-                        p1Y = 250 - paddleHeight / 2;
-                        p2X = 500 - paddleWidth - p1X;
-                        p2Y = 250 - paddleHeight / 2;
-                        
-                        vel1 = 0;
-                        vel2 = 0;
+                        if (ballY + ballHeight >= 500 || ballY <= 0) {
+                            ballVelY *= -1
+                        }
+                        ballX += ballVelX;
+                        ballY += ballVelY;
 
-                        paddleVel = originalVelocity + (-4+ballCounter)*0.2;
-                        if(paddleVel < originalVelocity){
-                            paddleVel = originalVelocity+0.4;
-                        }
-                        ballCounter = 0;
-                        p1Count += 1;
-                        roundStarted = false;
-                    } else if (ballX <= 0) {
-                        ballX = 250;
-                        ballY = 250;
-                        
-                        if(ballCounter > 4){
-                            ballVelX = randomChoice(possibleVelX) + 0.2*(ballCounter-4)
-                        }
-                        else{
-                            ballVelX = randomChoice(possibleVelX) + 0.4;
-                        }
-                        ballVelY = randomChoice(possibleVelY);
+                        if (ballX + ballWidth >= 500) {
+                            ballX = 250;
+                            ballY = 250;
 
-                        p1X = 40;
-                        p1Y = 250 - paddleHeight / 2;
-                        p2X = 500 - paddleWidth - p1X;
-                        p2Y = 250 - paddleHeight / 2;
-                        vel1 = 0;
-                        vel2 = 0;
+                            if (ballCounter > 4) {
+                                ballVelX = randomChoice(possibleVelX) + 0.2 * (ballCounter - 4)
+                            } else {
+                                ballVelX = randomChoice(possibleVelX) + 0.4;
+                            }
+                            ballVelY = randomChoice(possibleVelY);
 
-                        paddleVel = originalVelocity+0.2*(ballCounter-4);
-                        if(paddleVel < originalVelocity){
-                            paddleVel = originalVelocity+0.4;
+                            p1X = 40;
+                            p1Y = 250 - paddleHeight / 2;
+                            p2X = 500 - paddleWidth - p1X;
+                            p2Y = 250 - paddleHeight / 2;
+
+                            vel1 = 0;
+                            vel2 = 0;
+
+                            paddleVel = originalVelocity + (-4 + ballCounter) * 0.2;
+                            if (paddleVel < originalVelocity) {
+                                paddleVel = originalVelocity + 0.4;
+                            }
+                            ballCounter = 0;
+                            p1Count += 1;
+                            roundStarted = false;
+                        } else if (ballX <= 0) {
+                            ballX = 250;
+                            ballY = 250;
+
+                            if (ballCounter > 4) {
+                                ballVelX = randomChoice(possibleVelX) + 0.2 * (ballCounter - 4)
+                            } else {
+                                ballVelX = randomChoice(possibleVelX) + 0.4;
+                            }
+                            ballVelY = randomChoice(possibleVelY);
+
+                            p1X = 40;
+                            p1Y = 250 - paddleHeight / 2;
+                            p2X = 500 - paddleWidth - p1X;
+                            p2Y = 250 - paddleHeight / 2;
+                            vel1 = 0;
+                            vel2 = 0;
+
+                            paddleVel = originalVelocity + 0.2 * (ballCounter - 4);
+                            if (paddleVel < originalVelocity) {
+                                paddleVel = originalVelocity + 0.4;
+                            }
+                            ballCounter = 0;
+                            p2Count += 1;
+                            roundStarted = false
+
+
                         }
-                        ballCounter = 0;
-                        p2Count += 1;
-                        roundStarted = false
+
+
+
                     }
+                    if (collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight) || collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
+                        paddleVel += 0.2;
+                        ballVelX *= -1
+                        if (Math.abs(ballVelX) < maxVelX) {
+                            ballVelX += 0.05 * ballVelX / Math.abs(ballVelX)
+                        }
 
+                        ballCounter += 1;
+                        if (collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
+                            if (ballX < p1X + paddleWidth && (ballY > p1Y + paddleHeight || ballY + ballHeight < p1Y)) {
+                                ballVelX *= -1
+                                ballVelY *= -1
+                                ballVelY += 2 * ballVelY / Math.abs(ballVelY)
+                            } else {
+                                if (Math.abs(ballVelY) < maxVelY) {
+                                    ballVelY += vel1 * 0.5
+                                }
 
+                            }
 
-                }
-                if (collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight) || collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
-                    paddleVel += 0.2;
-                    ballVelX *= -1
-                    ballVelX += 0.2 * ballVelX / Math.abs(ballVelX)
-                    ballCounter += 1;
-                    if (collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
-                        ballX = p1X + ballWidth;
+                        }
+                        if (collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
+                            if (ballX > p2X && (ballY > p2Y + paddleHeight || ballY + ballHeight < p2Y)) {
+                                ballVelX *= -1
+                                ballVelY *= -1
+                                ballVelY += 2 * ballVelY / Math.abs(ballVelY)
+                            } else {
+                                if (Math.abs(ballVelY) < maxVelY) {
+                                    ballVelY += vel1 * 0.5
+                                }
+                            }
+
+                        }
                     }
-                    if (collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
-                        ballX = p2X - ballWidth;
-                    }
-                }
-            } else {
-                textAlign(CENTER)
-                textSize(50)
-
-                if (3 - Math.floor((frameCount - timerBegin) / pongFPS) === 0) {
-                    timer = false
                 } else {
-                    text(3 - Math.floor((frameCount - timerBegin) / pongFPS), 250, 250)
+                    textAlign(CENTER)
+                    textSize(50)
+
+                    if (3 - Math.floor((frameCount - timerBegin) / pongFPS) === 0) {
+                        timer = false
+                    } else {
+                        text(3 - Math.floor((frameCount - timerBegin) / pongFPS), 250, 250)
+                    }
                 }
             }
+
             fill(255);
             rect(p1X, p1Y, paddleWidth, paddleHeight)
             rect(p2X, p2Y, paddleWidth, paddleHeight);
@@ -441,6 +466,24 @@ function draw() {
                 textAlign(CENTER)
                 text("Press Space to Start", 250, 210)
             }
+            else if (p1Count === scoreToWin) {
+                fill(0)
+                textSize(70)
+                textAlign(CENTER)
+                text("Player 1 Wins!", 250, 170)
+                textSize(20)
+                fill(255,0,0)
+                text("Press Space to play again!", 250, 210)
+            } else if (p2Count === scoreToWin) {
+                fill(0)
+                textSize(70)
+                textAlign(CENTER)
+                text("Player 2 Wins!", 250, 170)
+                textSize(20)
+                fill(255,0,0)
+                text("Press Space to play again!", 250, 210)
+            }
+
         }
 
     }
@@ -455,21 +498,21 @@ function keyPressed() {
                     if (velX === 0) {
                         velX = -1
                         velY = 0
-                        
+
                     }
                     started = true
                 } else if (keyCode === RIGHT_ARROW || keyCode === 68) {
                     if (velX === 0) {
                         velX = 1
                         velY = 0
-                        
+
                     }
                     started = true
                 } else if (keyCode === UP_ARROW || keyCode === 87) {
                     if (velY === 0) {
                         velX = 0
                         velY = -1
-                        
+
                     }
                     started = true
                 } else if (keyCode === DOWN_ARROW || keyCode === 83) {
@@ -533,9 +576,30 @@ function keyPressed() {
                 timerBegin = frameCount
                 gameStarted = true;
                 roundStarted = true;
+            } else if (p1Count === scoreToWin || p2Count === scoreToWin && keyCode === 32) {
+                timer = true;
+                timerBegin = frameCount;
+                gameStarted = true;
+                roundStarted = true;
+
+                p1Count = 0;
+                p2Count = 0;
+
+                p1Y = 250 - paddleHeight / 2;
+                p2Y = 250 - paddleHeight / 2;
+                ballVelX = randomChoice(possibleVelX)
+                ballVelY = randomChoice(possibleVelY)
+
+                vel1 = 0;
+                vel2 = 0;
+
+                ballCounter = 0
+
+                paddleVel = originalVelocity
             } else if ((roundStarted === false) && keyCode === 32) {
                 roundStarted = true;
             }
+
         }
 
     }
