@@ -27,6 +27,7 @@ var velTime = 12;
 var snakeLength = 3;
 velX = 0;
 velY = 1;
+var maxVelTime = 8;
 
 //Pong Variables
 //Game Essential
@@ -38,9 +39,14 @@ var ballCounter;
 var originalVelocity = 4;
 var ballSize = 15;
 var pongFPS = 60
-
+var possibleVelX = [-2,-3,2,3]
+var possibleVelY = [1,2,-2,-1]
 var gameStarted, roundStarted;
 
+
+function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
 
 function setup() {
 
@@ -49,7 +55,6 @@ function setup() {
 
         canv.parent("snakeDiv")
         background(120)
-        noStroke()
         var options = {
             preventDefault: true
         };
@@ -89,13 +94,13 @@ function setup() {
         ballHeight = ballSize;
         ballWidth = ballSize;
 
-        paddleHeight = 80;
+        paddleHeight = 120;
         paddleWidth = 10
 
         ballX = 250;
         ballY = 250;
-        ballVelX = getRandomInt(2, 4);
-        ballVelY = getRandomInt(2, 3);
+        ballVelX = randomChoice(possibleVelX)
+        ballVelY = randomChoice(possibleVelY);
 
         p1X = 40;
         p1Y = 250 - paddleHeight / 2;
@@ -246,42 +251,64 @@ function draw() {
                     snakeY -= velY * 20
                     snakeX -= velX * 20
                 }
-                if (velX !== 0 || velY !== 0) {
+                if ((velX !== 0 || velY !== 0) && gameOver === false) {
                     snakePositions.push([snakeX, snakeY])
                 }
-
-
-                if (snakePositions.length > snakeLength && gameOver === false) {
-                    snakePositions.splice(0, 1)
+                if (hasSameArray(snakePositions)) {
+                    gameOver = true
+                    snakePositions[snakePositions.length-1][1] -= velY * 20
+                    snakePositions[snakePositions.length-1][0] -= velX * 20
                 }
-
-                if (appleX === snakeX && appleY === snakeY) {
-                    while (isInArray([appleX, appleY], snakePositions)) {
-                        appleX = Math.floor(Math.random() * 25) * 20;
-                        appleY = Math.floor(Math.random() * 25) * 20;
+                if(gameOver === false){
+                    if (snakePositions.length > snakeLength && gameOver === false) {
+                        snakePositions.splice(0, 1)
                     }
-
-                    score += 1;
-                    snakeLength += 1;
-                    if (velTime >= 8) {
-                        velTime -= 1;
+    
+                    if (appleX === snakeX && appleY === snakeY) {
+                        while (isInArray([appleX, appleY], snakePositions)) {
+                            appleX = Math.floor(Math.random() * 25) * 20;
+                            appleY = Math.floor(Math.random() * 25) * 20;
+                        }
+    
+                        score += 1;
+                        snakeLength += 1;
+                        if (velTime >= maxVelTime) {
+                            velTime -= 1;
+                        }
                     }
                 }
+                
 
 
             }
 
 
-            if (hasSameArray(snakePositions)) {
-                gameOver = true
-            }
-
+            
+            strokeWeight(1)
+            stroke(20)
             rect(appleX, appleY, 20, 20)
             fill(255)
-            for (var i = 0; i < snakePositions.length; i++) {
+            strokeWeight(4)
+            stroke(51)
+            for (var i = 0; i < snakePositions.length-1; i++) {
                 rect(snakePositions[i][0], snakePositions[i][1], 20, 20)
             }
+            fill(255,204,0)
+            rect(snakePositions[snakePositions.length-1][0], snakePositions[snakePositions.length-1][1], 20, 20)
             textSize(32)
+            if(score < 10){
+                fill(255)
+            }
+            else if(score < 20){
+                fill(255,204,0)
+            }
+            else if(score < 35){
+                fill(255,0,0)
+            }
+            else {
+                fill(0)
+            }
+            textAlign(LEFT)
             text(score, 460, 40)
             fill(255, 0, 0)
             if (gameOver === true) {
@@ -325,32 +352,55 @@ function draw() {
                     if (ballX + ballWidth >= 500) {
                         ballX = 250;
                         ballY = 250;
-                        ballVelX = getRandomInt(2, 4);
-                        ballVelY = getRandomInt(2, 3);
+                        
+                        if(ballCounter > 4){
+                            ballVelX = randomChoice(possibleVelX) + 0.2*(ballCounter-4)
+                        }
+                        else{
+                            ballVelX = randomChoice(possibleVelX) + 0.4;
+                        }
+                        ballVelY = randomChoice(possibleVelY);
+
                         p1X = 40;
                         p1Y = 250 - paddleHeight / 2;
                         p2X = 500 - paddleWidth - p1X;
                         p2Y = 250 - paddleHeight / 2;
+                        
                         vel1 = 0;
                         vel2 = 0;
+
+                        paddleVel = originalVelocity + (-4+ballCounter)*0.2;
+                        if(paddleVel < originalVelocity){
+                            paddleVel = originalVelocity+0.4;
+                        }
                         ballCounter = 0;
                         p1Count += 1;
-                        paddleVel = originalVelocity;
                         roundStarted = false;
                     } else if (ballX <= 0) {
                         ballX = 250;
                         ballY = 250;
-                        ballVelX = getRandomInt(2, 4);
-                        ballVelY = getRandomInt(2, 3)
+                        
+                        if(ballCounter > 4){
+                            ballVelX = randomChoice(possibleVelX) + 0.2*(ballCounter-4)
+                        }
+                        else{
+                            ballVelX = randomChoice(possibleVelX) + 0.4;
+                        }
+                        ballVelY = randomChoice(possibleVelY);
+
                         p1X = 40;
                         p1Y = 250 - paddleHeight / 2;
                         p2X = 500 - paddleWidth - p1X;
                         p2Y = 250 - paddleHeight / 2;
                         vel1 = 0;
                         vel2 = 0;
+
+                        paddleVel = originalVelocity+0.2*(ballCounter-4);
+                        if(paddleVel < originalVelocity){
+                            paddleVel = originalVelocity+0.4;
+                        }
                         ballCounter = 0;
                         p2Count += 1;
-                        paddleVel = originalVelocity;
                         roundStarted = false
                     }
 
@@ -400,28 +450,28 @@ function draw() {
 function keyPressed() {
     if (gamePaused === false) {
         if (game === 0) {
-            if (keypressed === false) {
+            if (keypressed === false || gameOver === true) {
                 if (keyCode === LEFT_ARROW || keyCode === 65) {
                     if (velX === 0) {
                         velX = -1
                         velY = 0
-                        started = true
+                        
                     }
-
+                    started = true
                 } else if (keyCode === RIGHT_ARROW || keyCode === 68) {
                     if (velX === 0) {
                         velX = 1
                         velY = 0
-                        started = true
+                        
                     }
-
+                    started = true
                 } else if (keyCode === UP_ARROW || keyCode === 87) {
                     if (velY === 0) {
                         velX = 0
                         velY = -1
-                        started = true
+                        
                     }
-
+                    started = true
                 } else if (keyCode === DOWN_ARROW || keyCode === 83) {
                     if (velY === 0) {
                         velX = 0

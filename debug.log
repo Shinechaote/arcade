@@ -20,3 +20,10 @@
 [0704/142149.973:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0704/142149.973:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0704/142649.970:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0705/145721.378:ERROR:settings.cc(325)] Settings version is not 1
+[0705/145721.402:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0705/150721.404:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0705/150721.404:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0705/151221.403:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0705/152721.405:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0705/154221.405:ERROR:crash_report_database_win.cc(469)] failed to stat report
