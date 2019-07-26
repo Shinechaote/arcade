@@ -31,20 +31,21 @@ var maxVelTime = 8;
 
 //Pong Variables
 //Game Essential
-var p1X, p1Y, p2X, p2Y, vel1, vel2, ballVelX, ballVelY, ballX, ballY;
+var p1X, p1Y, p2X, p2Y, vel1, vel2, ballVelX, ballVelY, ballX, ballY, lastBallX, lastBallY;
 var paddleHeight, paddleWidth, paddleVel, ballHeight, ballWidth;
 var p1Count, p2Count;
 var ballCounter;
 //Balancing
 var originalVelocity = 6;
 var ballSize = 15;
-var pongFPS = 60
+var pongFPS = 60;
 var possibleVelX = [-8, 8]
 var possibleVelY = [1, 2, -2, -1]
 var gameStarted, roundStarted;
 var maxVelX = 12;
 var maxVelY = 4;
-var scoreToWin = 1
+var scoreToWin = 10
+var hitsTopEdge = false;
 
 
 function randomChoice(arr) {
@@ -98,10 +99,12 @@ function setup() {
         ballWidth = ballSize;
 
         paddleHeight = 120;
-        paddleWidth = 20
+        paddleWidth = 10
 
         ballX = 250;
         ballY = 250;
+        lastBallX = ballX;
+        lastBallY = ballY;
         ballVelX = randomChoice(possibleVelX)
         ballVelY = randomChoice(possibleVelY);
 
@@ -347,18 +350,24 @@ function draw() {
                         if (ballY + ballHeight >= 500 || ballY <= 0) {
                             ballVelY *= -1
                         }
+                        lastBallX = ballX;
+                        lastBallY = ballY;
                         ballX += ballVelX;
                         ballY += ballVelY;
 
                         if (ballX + ballWidth >= 500) {
                             ballX = 250;
                             ballY = 250;
+                            lastBallX = 250;
+                            lastBallY = 250;
 
+                            hitsTopEdge = false;;
                             if (ballCounter > 4) {
-                                ballVelX = randomChoice(possibleVelX) + 0.2 * (ballCounter - 4)
+                                ballVelX = randomChoice(possibleVelX)
                             } else {
                                 ballVelX = randomChoice(possibleVelX) + 0.4;
                             }
+                            ballVelX += 0.2 * (ballCounter - 4) * ballVelX/Math.abs(ballVelX)
                             ballVelY = randomChoice(possibleVelY);
 
                             p1X = 40;
@@ -369,7 +378,7 @@ function draw() {
                             vel1 = 0;
                             vel2 = 0;
 
-                            paddleVel = originalVelocity + (-4 + ballCounter) * 0.2;
+                            paddleVel = originalVelocity + (-4 + ballCounter) * 0.05;
                             if (paddleVel < originalVelocity) {
                                 paddleVel = originalVelocity + 0.4;
                             }
@@ -379,12 +388,14 @@ function draw() {
                         } else if (ballX <= 0) {
                             ballX = 250;
                             ballY = 250;
-
+                            lastBallX = 250;
+                            lastBallY = 250;
                             if (ballCounter > 4) {
                                 ballVelX = randomChoice(possibleVelX) + 0.2 * (ballCounter - 4)
                             } else {
                                 ballVelX = randomChoice(possibleVelX) + 0.4;
                             }
+                            ballVelX += 0.2 * (ballCounter - 4) * ballVelX/Math.abs(ballVelX)
                             ballVelY = randomChoice(possibleVelY);
 
                             p1X = 40;
@@ -394,13 +405,14 @@ function draw() {
                             vel1 = 0;
                             vel2 = 0;
 
-                            paddleVel = originalVelocity + 0.2 * (ballCounter - 4);
+                            paddleVel = originalVelocity + 0.05 * (ballCounter - 4);
                             if (paddleVel < originalVelocity) {
                                 paddleVel = originalVelocity + 0.4;
                             }
                             ballCounter = 0;
                             p2Count += 1;
                             roundStarted = false
+                            hitsTopEdge = false;
 
 
                         }
@@ -408,39 +420,118 @@ function draw() {
 
 
                     }
-                    if (collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight) || collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
-                        paddleVel += 0.2;
-                        ballVelX *= -1
-                        if (Math.abs(ballVelX) < maxVelX) {
-                            ballVelX += 0.05 * ballVelX / Math.abs(ballVelX)
-                        }
+                    if (hitsTopEdge === false && collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight) || collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
+
+
+
 
                         ballCounter += 1;
                         if (collideRectRect(p1X, p1Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
-                            if (ballX < p1X + paddleWidth && (ballY > p1Y + paddleHeight || ballY + ballHeight < p1Y)) {
-                                ballVelX *= -1
-                                ballVelY *= -1
-                                ballVelY += 2 * ballVelY / Math.abs(ballVelY)
+                            if (
+                                
+                                                                
+                                (collideLineLine(lastBallX+ballWidth,lastBallY,ballX+ballWidth,ballY,p1X,p1Y,p1X+paddleWidth,p1Y) ||
+                                collideLineLine(lastBallX,lastBallY,ballX,ballY,p1X,p1Y,p1X+paddleWidth,p1Y) ||
+                                collideLineLine(lastBallX,lastBallY+ballHeight,ballX,ballY+ballHeight,p1X,p1Y,p1X+paddleWidth,p1Y) ||
+                                collideLineLine(lastBallX+ballWidth,lastBallY+ballHeight,ballX+ballWidth,ballY+ballHeight,p1X,p1Y,p1X+paddleWidth,p1Y)&&ballVelY<0) ||
+
+                                (collideLineLine(lastBallX+ballWidth,lastBallY,ballX+ballWidth,ballY,p1X,p1Y+paddleHeight,p1X+paddleWidth,p1Y+paddleHeight) ||
+                                collideLineLine(lastBallX,lastBallY,ballX,ballY,p1X,p1Y+paddleHeight,p1X+paddleWidth,p1Y+paddleHeight) ||
+                                collideLineLine(lastBallX,lastBallY+ballHeight,ballX,ballY+ballHeight,p1X,p1Y+paddleHeight,p1X+paddleWidth,p1Y+paddleHeight) ||
+                                collideLineLine(lastBallX+ballWidth,lastBallY+ballHeight,ballX+ballWidth,ballY+ballHeight,p1X,p1Y+paddleHeight,p1X+paddleWidth,p1Y+paddleHeight)&&ballVelY>0)
+                                
+   
+                                
+                                
+                                
+                                ) {
+                                
+                                
+                                    hitsTopEdge = true;
+                                ballVelX = Math.abs(ballVelX) * -1
+                                if (ballY > p1Y + paddleHeight / 2) {
+                                    ballY = p1Y+paddleHeight +10
+                                    if(ballVelY < 0){
+                                        ballVelY *= -1.5
+                                    }
+                                    else{
+                                        ballVelY *= 1.5
+                                    }
+
+                                } else {
+                                    ballY = p1Y - ballHeight- 10
+                                    if(ballVelY > 0){
+                                        ballVelY *= -1.5
+                                    }
+                                    else{
+                                        ballVelY *= 1.5
+                                    }
+                                }
+                                p1Y -= vel1*2
+                                
+                                vel1 /= 10
                             } else {
                                 if (Math.abs(ballVelY) < maxVelY) {
-                                    ballVelY += vel1 * 0.5
+                                    ballVelY += vel1 * 0.35
                                 }
 
                             }
-
+                            
                         }
                         if (collideRectRect(p2X, p2Y, paddleWidth, paddleHeight, ballX, ballY, ballWidth, ballHeight)) {
-                            if (ballX > p2X && (ballY > p2Y + paddleHeight || ballY + ballHeight < p2Y)) {
-                                ballVelX *= -1
-                                ballVelY *= -1
-                                ballVelY += 2 * ballVelY / Math.abs(ballVelY)
+                            if (
+
+                                (collideLineLine(lastBallX+ballWidth,lastBallY,ballX+ballWidth,ballY,p2X,p2Y,p2X+paddleWidth,p2Y) || 
+                                collideLineLine(lastBallX,lastBallY,ballX,ballY,p2X,p2Y,p2X+paddleWidth,p2Y) || 
+                                collideLineLine(lastBallX,lastBallY+ballHeight,ballX,ballY+ballHeight,p2X,p2Y,p2X+paddleWidth,p2Y) || 
+                                collideLineLine(lastBallX+ballWidth,lastBallY+ballHeight,ballX+ballWidth,ballY+ballHeight,p2X,p2Y,p2X+paddleWidth,p2Y)&&ballVelY<0) ||
+                                
+                                (collideLineLine(lastBallX+ballWidth,lastBallY,ballX+ballWidth,ballY,p2X,p2Y+paddleHeight,p2X+paddleWidth,p2Y+paddleHeight) ||
+                                collideLineLine(lastBallX,lastBallY,ballX,ballY,p2X,p2Y+paddleHeight,p2X+paddleWidth,p2Y+paddleHeight) ||
+                                collideLineLine(lastBallX,lastBallY+ballHeight,ballX,ballY+ballHeight,p2X,p2Y+paddleHeight,p2X+paddleWidth,p2Y+paddleHeight) ||
+                                collideLineLine(lastBallX+ballWidth,lastBallY+ballHeight,ballX+ballWidth,ballY+ballHeight,p2X,p2Y+paddleHeight,p2X+paddleWidth,p2Y+paddleHeight)&&ballVelY>0)
+                                
+                                
+                                ) {
+                                hitsTopEdge = true
+                                ballVelX = Math.abs(ballVelX)
+                                
+                                if (ballY > p2Y + paddleHeight / 2) {
+                                    ballY = p2Y+paddleHeight +10
+                                    if(ballVelY < 0){
+                                        ballVelY *= -1.5
+                                    }
+                                    else{
+                                        ballVelY *= 1.5
+                                    }
+
+                                } else {
+                                    ballY = p2Y - ballHeight- 10
+                                    if(ballVelY > 0){
+                                        ballVelY *= -1.5
+                                    }
+                                    else{
+                                        ballVelY *= 1.5
+                                    }
+                                }
+                                p2Y -= vel2*2
+                                
+                                vel2 /= 10
                             } else {
                                 if (Math.abs(ballVelY) < maxVelY) {
-                                    ballVelY += vel1 * 0.5
+                                    ballVelY += vel2 * 0.35
                                 }
                             }
-
+                            
                         }
+                        if (hitsTopEdge === false) {
+                            paddleVel += 0.2;
+                            ballVelX *= -1
+                            if (Math.abs(ballVelX) < maxVelX) {
+                                ballVelX += 0.05 * ballVelX / Math.abs(ballVelX)
+                            }
+                        }
+                        
                     }
                 } else {
                     textAlign(CENTER)
@@ -465,14 +556,13 @@ function draw() {
                 textSize(40)
                 textAlign(CENTER)
                 text("Press Space to Start", 250, 210)
-            }
-            else if (p1Count === scoreToWin) {
+            } else if (p1Count === scoreToWin) {
                 fill(0)
                 textSize(70)
                 textAlign(CENTER)
                 text("Player 1 Wins!", 250, 170)
                 textSize(20)
-                fill(255,0,0)
+                fill(255, 0, 0)
                 text("Press Space to play again!", 250, 210)
             } else if (p2Count === scoreToWin) {
                 fill(0)
@@ -480,7 +570,7 @@ function draw() {
                 textAlign(CENTER)
                 text("Player 2 Wins!", 250, 170)
                 textSize(20)
-                fill(255,0,0)
+                fill(255, 0, 0)
                 text("Press Space to play again!", 250, 210)
             }
 
